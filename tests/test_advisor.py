@@ -1,42 +1,39 @@
 from src.analytics import energy_health_score
 from src.bill_estimator import bill_summary
-from src.recommendation import generate_recommendations
+from src.advisor import generate_advisor_report
 
 import pandas as pd
 
-# Dummy historical data
+
 daily_df = pd.DataFrame({
     "Daily_Energy_kWh": [20, 25, 24, 28, 30, 29]
 })
 
-# Dummy forecast
 forecast = pd.DataFrame({
     "yhat": [32, 33, 34, 31, 35, 33, 32]
 })
 
-# Generate health report
 health = energy_health_score(
     daily_df,
     forecast
 )
 
-# Generate bill
 bill = bill_summary(
     health["predicted_average"],
-    tariff_rate=8.5
+    8.5
 )
 
-# Generate recommendations
-recommendations = generate_recommendations(
+advisor = generate_advisor_report(
     health,
     bill
 )
 
-print("\nRecommendation Cards\n")
+print("\nAI Energy Advisor Report\n")
 
-for card in recommendations:
+for section, value in advisor.items():
 
     print("=" * 50)
 
-    for key, value in card.items():
-        print(f"{key}: {value}")
+    print(section)
+
+    print(value)

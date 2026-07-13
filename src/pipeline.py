@@ -3,25 +3,9 @@ pipeline.py
 
 Main orchestration module for EcoWatt AI.
 
-Runs the complete pipeline:
-
-Load Dataset
-↓
-
-Preprocessing
-↓
-
-Forecasting
-↓
-
-Analytics
-↓
-
-Bill Estimation
-↓
-
-Recommendations
+Runs the complete pipeline.
 """
+
 from src.data_loader import load_dataset
 
 from src.preprocessing import (
@@ -50,15 +34,12 @@ from src.recommendation import (
     generate_recommendations
 )
 
+from src.advisor import generate_advisor_report
 def run_pipeline(
     dataset_path,
     model_path,
     tariff_rate=8.5
 ):
-    """
-    Execute the complete EcoWatt AI pipeline.
-    """
-    # Load dataset
     df = load_dataset(dataset_path)
 
     df = convert_numeric(df)
@@ -75,10 +56,7 @@ def run_pipeline(
 
     future = create_future_dataframe(model)
 
-    forecast = predict_energy(
-        model,
-        future
-    )
+    forecast = predict_energy(model, future)
 
     health = energy_health_score(
         daily_df,
@@ -90,21 +68,24 @@ def run_pipeline(
         tariff_rate
     )
 
+    advisor = generate_advisor_report(
+        health,
+        bill
+    )
+
     recommendations = generate_recommendations(
         health,
         bill
     )
 
+    print("✅ Pipeline Complete")
+
     return {
-
         "daily_data": daily_df,
-
         "forecast": forecast,
-
         "health": health,
-
         "bill": bill,
-
-        "recommendations": recommendations
-
+        "advisor": advisor,
+        "recommendations": recommendations,
     }
+    
